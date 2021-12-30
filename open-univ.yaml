@@ -1,0 +1,543 @@
+openapi: '3.0.0'
+info:
+ version: 1.0.0
+ title: (v1.0) open-univ project
+ description: (v1.0) For educational purposes only. Petri Laitinen, Karelia UAS
+servers:
+ - url: https://localhost:3000/
+   description: (v1.0) "Open University Sample API Application"
+
+paths:
+  /api/customers:
+    post:
+      summary: Creates an object of type Customer
+      tags: 
+        - Access Control
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/CustomerRequest'
+      responses:
+        '201':
+          description: (v1.0) A new customer has been succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        default:
+          description: Unexpected error
+    get:
+      summary: Returns a list of customers for authorized customers (users)
+      tags: 
+        - Access Control
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+      operationId: listUsers
+      responses:
+        '200':
+          description: (v1.0) Succesfully returned a list of customers (users)
+          content:
+            application/json:
+              schema:
+                description: list of customer descriptors
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+  /api/login:
+    post:
+      summary: Login functionality. Creates JWT Token and passes it back for a caller.
+      tags: 
+        - Access Control
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/LoginRequest'
+      responses:
+        '201':
+          description: (v1.0) A new JWT access token has been succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/AWTAccessToken'
+        default:
+          description: Unexpected error
+
+  /api/customers/{customer_id}/cart:
+    get:
+      summary: Returns a customer shopping cart
+      tags: 
+        - Customer Services
+      parameters:
+        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+        - in: path
+          name: customer_id
+          schema:
+            type: integer
+            example: 123
+          required: true
+          decription: numerical customer identifier
+      operationId: getCart
+      responses:
+        '200':
+          description: (v1.0) Succesfully returned a Customer Services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        default:
+          description: Unexpected error
+    post:
+      summary: Add a service in to the shopping cart
+      tags:
+        - Customer Services
+      parameters:
+        - in: path
+          name: customer_id
+          schema:
+            type: integer
+            example: 123
+          required: true
+          decription: numerical customer identifier
+        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+        - $ref: '#/components/requests/PostItemToCart'
+      operationId: postCart
+      responses:
+        '201':
+          description: (v1.0) Succesfully added a service into the Customer Services
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /api/customers/{customer_id}/checkout:
+    post:
+      summary: Checkout all the services added into the shopping cart
+      tags:
+        - Customer Services
+      parameters:
+        - in: path
+          name: customer_id
+          schema:
+            type: integer
+            example: 123
+          required: true
+          decription: numerical customer identifier
+        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+      operationId: postCart
+      responses:
+        '201':
+          description: (v1.0) Checkout succesful
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /api/courses:
+    get:
+      summary: Returns a list of available courses
+      tags: 
+        - Courses
+      operationId: listCourses
+      responses:
+        '200':
+          description: (v1.0) Succesfully returned a list of available courses
+          content:
+            application/json:
+              schema:
+                description: list of service descriptors
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+    post:
+      summary: Creates an object of type Course
+      tags: 
+        - Courses
+      operationId: createCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/CourseRequest'
+      responses:
+        '201':
+          description: (v1.0) A new courses has been succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        default:
+          description: Unexpected error
+
+  /api/courses/{course_id}:
+    get:
+      summary: Returns a list of courses available
+      tags: 
+        - Courses
+      parameters:
+        - in: path
+          name: course_id
+          schema:
+            type: string
+            format: uuid
+            example: DD10004
+          required: true
+          decription: numerical customer identifier
+      operationId: getCourse
+      responses:
+        '200':
+          description: (v1.0) Succesfully returned a course object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        default:
+          description: Unexpected error
+
+  /api/services:
+    get:
+      summary: Returns a list of available courses
+      parameters:
+        - $ref: '#/components/parameters/OrderByAscendingDescending'
+        - $ref: '#/components/parameters/UserId'
+      tags: 
+        - Services
+      operationId: listServices
+      responses:
+        '200':
+          description: (v1.0) Succesfully returned a list of available services
+          content:
+            application/json:
+              schema:
+                description: list of service descriptors
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+    post:
+      summary: Creates an object of type Service
+      tags: 
+        - Services
+      operationId: createService
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/CreateServiceRequest'
+      responses:
+        '201':
+          description: (v1.0) A new customer has been succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        default:
+          description: Unexpected error
+
+  /api/services/{service_id}:
+    get:
+      summary: Returns a course descriptor object
+      tags: 
+        - Services
+      parameters:
+      - name: service_id
+        in: path
+        required: true
+        description: (v1.0) Service Identifier
+        schema:
+          type: string
+          format: uuid
+      operationId: findCourseById
+      responses:
+        200:
+          description: (v1.0) Succesfully returned a list of courses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+
+  /api/teams/studentservices/transcripts:
+    post:
+      summary: Request a transcript of records
+      tags:
+        - Customer Services
+      parameters:
+        - in: path
+          name: customer_id
+          schema:
+            type: integer
+            example: 123
+          required: true
+          decription: numerical customer identifier
+        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+        - $ref: '#/components/requests/PostItemToCart'
+      operationId: postCart
+      responses:
+        '201':
+          description: (v1.0) Succesfully added a service into the Customer Services
+          content:
+            application/json:
+              schema:
+                type: string
+
+
+tags:
+  - name: Access Control
+    description: (v1.0) Represents an access control functions
+  - name: Courses
+    description: (v1.0) Represents course descriptions
+  - name: Services
+    description: (v1.0) Represents service description objects
+  - name: Customer Services
+    description: (v1.0) Represents a Customer Services objects and data
+
+components:
+
+  parameters:
+    AuthorizationHeader: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
+      name: AuthorizationHeader
+      in: header
+      schema:
+        type: string
+    OrderByAscendingDescending:
+      name: OrderByAscendingDescending
+      in: query
+      schema:
+        type: string
+        enum: [ ascending, descending ]
+        example: ascending
+    UserId:
+      name: UserId
+      in: query
+      schema:
+        type: integer
+        example: 123
+
+  requests:
+    CustomerRequest:
+      type: object
+      properties:
+        forename:
+          type: string
+          nullable: true
+          description: (v1.0) forename
+          maxLength: 100
+        surname:
+          type: string
+          nullable: true
+          description: (v1.0) family name
+          maxLength: 100
+        username:
+          type: string
+          nullable: true
+          description: (v1.0) forename
+          maxLength: 100
+        password:
+          type: string
+          nullable: true
+          description: (v1.0) forename
+          maxLength: 100
+        email:
+          type: string
+          nullable: true
+          description: (v1.0) email address
+          maxLength: 1024
+      example:
+        forename: Brita
+        surname: Lollobrigida
+        username: brita
+        password: sosecret
+        email: brita@somemail.com
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          nullable: false
+          maxlength: 100
+          example: brita
+        password:
+          type: string
+          nullable: false
+          maxLength: 100
+          example: sosecret
+    PostItemToCart:
+      type: object
+      properties:
+        customerid:
+          type: integer
+          nullable: false
+        serviceid:
+          type: string
+          nullable: false
+    CourseRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: (v1.0) course name
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+          description: (v1.0) course description
+          maxLength: 1024
+        learningObjectives:
+          type: string
+          nullable: true
+          description: (v1.0) learning objectives for the course
+          maxLength: 1024   
+      example:
+        name: API Design & Development
+        description: API Design & Development using REST, GraphQL and Open API
+        learningObjectives: >
+          Student knows the most common API technologies in use today
+          Student is able to comprehend the opportunities and challenges in exploiting API's in businesses
+          Student is able to design, document and implement REST APIs
+          Student is able to design, document and implement GraphQL APIs
+          Student is is able to apply OpenAPI Specification in describing and designing APIs    
+    CreateServiceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: (v1.0) Course implementation description
+          maxLength: 100
+          example: API Design & Development
+        startDate:
+          type: string
+          format: date
+          description: course starting day
+          example: "2021-02-28"
+        endDate:
+          type: string
+          format: date
+          description: course end date. can be null.
+          nullable: true
+          example: "2021-06-30"
+        course:
+          $ref: '#/components/schemas/Course'
+
+  responses:
+    AWTAccessToken:
+      name: AWTAccessToken
+      description: AWT Access Token generated during the /api/login POST request
+      schema:
+        type: string
+        example: a random looking AWT access token 1234567890
+
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          description: (v1.0) identifier
+        forename:
+          type: string
+          nullable: false
+          description: (v1.0) forename
+          maxLength: 100
+        surname:
+          type: string
+          nullable: false
+          description: (v1.0) family name
+          maxLength: 100
+        username:
+          type: string
+          nullable: false
+          description: (v1.0) forename
+          maxLength: 100
+        password:
+          type: string
+          nullable: false
+          description: (v1.0) forename
+          maxLength: 100
+        email:
+          type: string
+          nullable: false
+          description: (v1.0) email address
+          maxLength: 1024
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+      example:
+        id: 123
+        forename: Brita
+        surname: Lollobrigida
+        username: brita
+        password: sosecret
+        email: brita@somemail.com
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+          description: (v1.0) identifier
+        name:
+          type: string
+          nullable: true
+          description: (v1.0) course name
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+          description: (v1.0) course description
+          maxLength: 1024
+        learningObjectives:
+          type: string
+          nullable: true
+          description: (v1.0) learning objectives for the course
+          maxLength: 1024   
+      example:
+        id: DD10004
+        name: API Design & Development
+        description: API Design & Development using REST, GraphQL and Open API
+        learningObjectives: >
+          Student knows the most common API technologies in use today
+          Student is able to comprehend the opportunities and challenges in exploiting API's in businesses
+          Student is able to design, document and implement REST APIs
+          Student is able to design, document and implement GraphQL APIs
+          Student is is able to apply OpenAPI Specification in describing and designing APIs
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+          example: DD10004-3001
+        name:
+          type: string
+          nullable: true
+          description: (v1.0) Course implementation description
+          maxLength: 100
+          example: API Design & Development
+        startDate:
+          type: string
+          format: date
+          description: course starting day
+          example: "2021-02-28"
+        endDate:
+          type: string
+          format: date
+          description: course end date. can be null.
+          nullable: true
+          example: "2021-06-30"
+        course:
+          $ref: '#/components/schemas/Course'
