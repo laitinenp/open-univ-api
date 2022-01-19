@@ -2,37 +2,8 @@
 
 const { response } = require("./app")
 
-/*
-      example:
-        id: 123
-        forename: Brita
-        surname: Lollobrigida
-        username: brita
-        password: sosecret
-        email: brita@somemail.com
-        */
-var _customers = [
-    {
-        "id": 123,
-        "forename": "Brita",
-        "surname": "Lollobrigida",
-        "username": "brita",
-        "password": "sosecret",
-        "email": "brita@somemail.com"
-    }
-]
+var counter = 1
 
-/*       example:
-        id: DD10004
-        name: API Design & Development
-        description: API Design & Development using REST, GraphQL and Open API
-        learningObjectives: >
-          Student knows the most common API technologies in use today
-          Student is able to comprehend the opportunities and challenges in exploiting API's in businesses
-          Student is able to design, document and implement REST APIs
-          Student is able to design, document and implement GraphQL APIs
-          Student is is able to apply OpenAPI Specification in describing and designing APIs
-*/
 var _courses = [
     {
         "id": "DD10004",
@@ -58,20 +29,45 @@ var _services = [
     }
 ]
 
-const getAllCustomers = (onError, onSuccess) => {
-    onSuccess(_customers)
+var _users = [
+    {
+        "userId": 123,
+        "forename": "Gina",
+        "surname": "Lollobrigida",
+        "username": "gina",
+        "password": "socute",
+        "email": "gina@email.com",
+        "cart": _services[0]
+    }
+]
+
+const getAllUsers = (onError, onSuccess) => {
+    onSuccess(_users)
 }
 
-const getCustomer = (id, onError, onSuccess) => {
+const getUser = (id, onError, onSuccess) => {
     let done = false
-    for ( let i = 0; i < _customers.length; i++ ) {
-        if ( _customers[i].username === id ) {
+    for ( let i = 0; i < _users.length; i++ ) {
+        if ( _users[i].userId === id ) {
             done = true
-            onSuccess( _customers[ i ] )
+            onSuccess( _users[ i ] )
         }
     }
     if (! done)
-        onError("Course item not found")       
+        onError("Customer item not found")       
+}
+
+const getUserByUsername = (username, onError, onSuccess) => {
+    res = _users.filter( cust => cust.username === username )
+    if ( res === null || res.length == 0 ) onError("User item not found")
+    else onSuccess( res[0] )
+}
+
+const addUser = (data, onError, onSuccess) => {
+    _users.push( data )
+    data.userId = counter
+    counter = counter + 1
+    onSuccess(data)
 }
 
 const getAllCourses = (onError, onSuccess) => {
@@ -79,15 +75,9 @@ const getAllCourses = (onError, onSuccess) => {
 }
 
 const getCourse = (id, onError, onSuccess) => {
-    let done = false
-    for ( let i = 0; i < _courses.length; i++ ) {
-        if ( _courses[i].id === id ) {
-            done = true
-            onSuccess( _courses[ i ] )
-        }
-    }
-    if (! done)
-        onError("Course item not found")    
+    res = _courses.filter( course => course.id === id )
+    if ( res == null ) onError("Course item not found")
+    else onSuccess( res[0] )
 }
 
 const getAllServices = (onError, onSuccess) => {
@@ -95,19 +85,16 @@ const getAllServices = (onError, onSuccess) => {
 }
 
 const getService = (id, onError, onSuccess) => {
-    let done = false
-    for ( let i = 0; i < _services.length; i++ ) {
-        if ( _services[i].id === id ) {
-            done = true
-            onSuccess( _services[ i ] )
-        }
-    }
-    if (! done)
-        onError("Service item not found")    
+    res = _services.filter( service => service.id === id )
+    if ( res == null ) onError("Service item not found")
+    else onSuccess( res[0] ) 
 }
 
 module.exports = {
-    getAllCustomers,
+    getAllUsers,
+    getUser,
+    getUserByUsername,
+    addUser,
     getAllCourses,
     getCourse,
     getAllServices,

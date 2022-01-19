@@ -1,4 +1,5 @@
 var db = require('../db.js')
+const jwt = require("jsonwebtoken")
 var router = require('express').Router()
 
 const handleError = (err, response) => {
@@ -9,7 +10,7 @@ const prcessToken = (request) => {
   const auth = request.get("authorization");
   if (auth && auth.toLowerCase().startsWith("bearer ")) {
       const token = auth.substring(7)
-      const decodedToken = jwt.verify(token, process.env.SECRET);
+      const decodedToken = jwt.verify(token, "sosecret" /* process.env.SECRET */);
       
       if (!token || !decodedToken.id) {
           return false
@@ -44,6 +45,18 @@ router.get('/:id', (request, response) => {
         response.json(courses);
     }
   )
+})
+
+/* post allower for authorized users */
+router.post('/', (request, response) => {
+  console.log(request.body)
+  const decodedUserId = prcessToken(request);
+  console.log(decodedUserId)
+  if (decodedUserId != request.body.userId) {
+      handleError({ err: "Not Authorized" }, response);
+      return;
+  }
+  response.json({"message":"OK"})
 })
 
 module.exports = router;

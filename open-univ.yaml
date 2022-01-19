@@ -8,51 +8,34 @@ servers:
    description: (v1.0) "Open University Sample API Application"
 
 paths:
-  /api/customers:
+  /api/users:
     post:
-      summary: Creates an object of type Customer
+      summary: Creates an object of type User
       tags: 
         - Access Control
-      operationId: createCustomer
+      operationId: createUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/CustomerRequest'
+              $ref: '#/components/requests/UserRequest'
       responses:
         '201':
-          description: (v1.0) A new customer has been succesfully created
+          description: (v1.0) A new user has been succesfully created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/User'
         default:
           description: Unexpected error
-    get:
-      summary: Returns a list of customers for authorized customers (users)
-      tags: 
-        - Access Control
-      parameters:
-        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
-      operationId: listUsers
-      responses:
-        '200':
-          description: (v1.0) Succesfully returned a list of customers (users)
-          content:
-            application/json:
-              schema:
-                description: list of customer descriptors
-                type: array
-                items:
-                  $ref: '#/components/schemas/Customer'
 
-  /api/login:
+  /api/sessions:
     post:
       summary: Login functionality. Creates JWT Token and passes it back for a caller.
       tags: 
         - Access Control
-      operationId: createCustomer
+      operationId: createSession
       requestBody:
         required: true
         content:
@@ -65,24 +48,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/AWTAccessToken'
+                $ref: '#/components/responses/UserSession'
+        '401':
+            description: (v1.0) Not authorized
+        '405':
+          description: Unsupported Media Type
         default:
           description: Unexpected error
 
-  /api/customers/{customer_id}/cart:
+  /api/sessions/{userId}:
+    delete:
+      summary: Logout functionality.
+      tags: 
+        - Access Control
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: false
+      responses:
+        '204':
+          description: No content
+
+  /api/users/{userId}/cart:
     get:
       summary: Returns a customer shopping cart
       tags: 
         - Customer Services
       parameters:
-        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
-        - in: path
-          name: customer_id
-          schema:
-            type: integer
-            example: 123
-          required: true
-          decription: numerical customer identifier
+        - $ref: '#/components/parameters/UserId'  # Authorization required for a Customer Services
+        - $ref: '#/components/parameters/JWTHeaderToken'
+      security:
+        - bearerAuth: []
       operationId: getCart
       responses:
         '200':
@@ -93,32 +89,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Service'
+        '401':
+          description: Unauhtorized
+        '405':
+          description: Unsupported Media Type
         default:
           description: Unexpected error
-    post:
-      summary: Add a service in to the shopping cart
-      tags:
-        - Customer Services
-      parameters:
-        - in: path
-          name: customer_id
-          schema:
-            type: integer
-            example: 123
-          required: true
-          decription: numerical customer identifier
-        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
-        - $ref: '#/components/requests/PostItemToCart'
-      operationId: postCart
-      responses:
-        '201':
-          description: (v1.0) Succesfully added a service into the Customer Services
-          content:
-            application/json:
-              schema:
-                type: string
 
-  /api/customers/{customer_id}/checkout:
+  /api/ous/checkout:
     post:
       summary: Checkout all the services added into the shopping cart
       tags:
@@ -132,10 +110,12 @@ paths:
           required: true
           decription: numerical customer identifier
         - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
+      security:
+        - bearerAuth: []
       operationId: postCart
       responses:
-        '201':
-          description: (v1.0) Checkout succesful
+        '501':
+          description: (v1.0) Not yet implemented
           content:
             application/json:
               schema:
@@ -157,35 +137,39 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
-    post:
-      summary: Creates an object of type Course
-      tags: 
+        '405':
+          description: Unsupported Media Type
+    head:
+      summary: For testing if the resource URI is available
+      tags:
         - Courses
-      operationId: createCourse
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requests/CourseRequest'
+      operationId: listCourses
       responses:
-        '201':
-          description: (v1.0) A new courses has been succesfully created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Course'
-        default:
-          description: Unexpected error
+        '204':
+          description: No content
 
-  /api/courses/{course_id}:
+    options:
+      summary: Returns a list of applicable HTTP verbs in the Allow header field.
+      tags:
+        - Courses
+      operationId: listCourses
+      responses:
+        204:
+          description: No content. Response data in the Allow header field.
+          headers:
+            Allow:
+              schema:
+                type: string
+              description: Comma separated list of HTTP Verbs, e.g. GET, OPTIONS, HEAD, POST
+
+  /api/courses/{courseId}:
     get:
-      summary: Returns a list of courses available
+      summary: Returns a course
       tags: 
         - Courses
       parameters:
         - in: path
-          name: course_id
+          name: courseId
           schema:
             type: string
             format: uuid
@@ -200,6 +184,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Course'
+        '404':
+          description: Not found
+        '405':
+          description: Unsupported Media Type
+        default:
+          description: Unexpected error
+    put:
+      summary: Updates a Course object. If it does not exist before, then it is created.
+      tags: 
+        - Courses
+      operationId: putCourse
+      parameters:
+        - in: path
+          name: course_id
+          schema:
+            type: string
+            format: uuid
+            example: DD10004
+          required: true
+          decription: numerical customer identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+      responses:
+        '200':
+          description: (v1.0) A course object has been succesfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '201':
+          description: (v1.0) A new courses has been succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '405':
+          description: Unsupported Media Type
         default:
           description: Unexpected error
 
@@ -212,6 +237,7 @@ paths:
       tags: 
         - Services
       operationId: listServices
+      
       responses:
         '200':
           description: (v1.0) Succesfully returned a list of available services
@@ -222,6 +248,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Service'
+        '405':
+          description: Unsupported Media Type
     post:
       summary: Creates an object of type Service
       tags: 
@@ -233,6 +261,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/requests/CreateServiceRequest'
+      security:
+        - bearerAuth: []
       responses:
         '201':
           description: (v1.0) A new customer has been succesfully created
@@ -240,12 +270,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Service'
+        '405':
+          description: Unsupported Media Type
         default:
           description: Unexpected error
 
   /api/services/{service_id}:
     get:
-      summary: Returns a course descriptor object
+      summary: Returns a service descriptor object
       tags: 
         - Services
       parameters:
@@ -256,10 +288,10 @@ paths:
         schema:
           type: string
           format: uuid
-      operationId: findCourseById
+      operationId: findServiceById
       responses:
         200:
-          description: (v1.0) Succesfully returned a list of courses
+          description: (v1.0) Succesfully returned a service descriptor
           content:
             application/json:
               schema:
@@ -272,18 +304,21 @@ paths:
         - Customer Services
       parameters:
         - in: path
-          name: customer_id
+          name: userId
           schema:
-            type: integer
-            example: 123
+            type: string
+            format: uuid
+            example: '1234567890'
           required: true
           decription: numerical customer identifier
         - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
         - $ref: '#/components/requests/PostItemToCart'
       operationId: postCart
+      security:
+        - bearerAuth: []
       responses:
-        '201':
-          description: (v1.0) Succesfully added a service into the Customer Services
+        '501':
+          description: (v1.0) The service not yet implemented
           content:
             application/json:
               schema:
@@ -302,12 +337,25 @@ tags:
 
 components:
 
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+
   parameters:
-    AuthorizationHeader: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
-      name: AuthorizationHeader
+    JWTHeaderToken: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
+      name: Authorize
       in: header
       schema:
         type: string
+      description: JWT access token string received from server in the /api/session POST response
+    JWTPathParameterToken: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
+      name: JWTPathParameterToken
+      in: path
+      schema:
+        type: string
+      description: JWT access token string received from server in the /api/session POST response
     OrderByAscendingDescending:
       name: OrderByAscendingDescending
       in: query
@@ -316,14 +364,14 @@ components:
         enum: [ ascending, descending ]
         example: ascending
     UserId:
-      name: UserId
+      name: userId
       in: query
       schema:
         type: integer
         example: 123
 
   requests:
-    CustomerRequest:
+    UserRequest:
       type: object
       properties:
         forename:
@@ -373,7 +421,7 @@ components:
     PostItemToCart:
       type: object
       properties:
-        customerid:
+        userid:
           type: integer
           nullable: false
         serviceid:
@@ -430,18 +478,57 @@ components:
           $ref: '#/components/schemas/Course'
 
   responses:
-    AWTAccessToken:
-      name: AWTAccessToken
-      description: AWT Access Token generated during the /api/login POST request
+    JWTAccessToken:
+      name: JWTAccessToken
+      description: JWT Access Token generated during the /api/login POST request
       schema:
         type: string
         example: a random looking AWT access token 1234567890
-
-  schemas:
-    Customer:
+    UserSession:
       type: object
       properties:
-        id:
+        userId:
+          type: integer
+          nullable: false
+          description: (v1.0) identifier
+        forename:
+          type: string
+          nullable: false
+          description: (v1.0) forename
+          maxLength: 100
+        surname:
+          type: string
+          nullable: false
+          description: (v1.0) family name
+          maxLength: 100
+        username:
+          type: string
+          nullable: false
+          description: (v1.0) forename
+          maxLength: 100
+        email:
+          type: string
+          nullable: false
+          description: (v1.0) email address
+          maxLength: 1024
+        token:
+          type: string
+          nullable: false
+          description: (v1.0) email address
+          maxLength: 1024
+      example:
+        userId: 123
+        forename: Brita
+        surname: Lollobrigida
+        username: brita
+        email: brita@somemail.com
+        token: 1234567890abc
+
+  schemas:
+    User:
+      type: object
+      properties:
+        userId:
           type: integer
           nullable: false
           description: (v1.0) identifier
@@ -475,12 +562,13 @@ components:
           items:
             $ref: '#/components/schemas/Course'
       example:
-        id: 123
+        userId: 123
         forename: Brita
         surname: Lollobrigida
         username: brita
         password: sosecret
         email: brita@somemail.com
+
     Course:
       type: object
       properties:
