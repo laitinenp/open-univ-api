@@ -8,7 +8,7 @@ const
 
 var coursesRouter           = require('./routes/courses')
 var usersRouter             = require('./routes/users')
-var sessionsRouter             = require("./routes/sessions")
+var sessionsRouter          = require("./routes/sessions")
 var servicesRouter          = require("./routes/services")
 
 app.use(express.json())
@@ -19,8 +19,12 @@ app.use('/api/users',       usersRouter)
 app.use('/api/services',    servicesRouter)
 app.use('/api/sessions',    sessionsRouter)
 
+// serve swagger pages in /api/doc URI
 var swaggerOptions = { }
 app.use('/api/doc',         swaggerUi.serve,
                             swaggerUi.setup(swaggerDocument, swaggerOptions))
+
+// serve yaml file in /api/yaml
+app.use('/api/yaml',        express.static('./open-univ.yaml'))
 
 module.exports = app;
