@@ -5,8 +5,11 @@ For demonstrational purposes
 Test run sequence using the command line or power shell:
 
 git clone https://github.com/laitinenp/open-univ-api.git
-cd open-univ-
+
+cd open-univ-api
+
 npm install
+
 npm start
 
 If running successfully, the Swagger documentation can be found from http://localhost:3000/api/doc/. The YAML file can be requested from http://localhost:3000/api/yaml.
