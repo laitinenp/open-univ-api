@@ -14,6 +14,7 @@ var servicesRouter          = require("./routes/services")
 app.use(express.json())
 app.use(cors())
 
+// serve api endpoints URI's /api/<route>
 app.use('/api/courses',     coursesRouter)
 app.use('/api/users',       usersRouter)
 app.use('/api/services',    servicesRouter)
