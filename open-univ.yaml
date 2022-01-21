@@ -65,6 +65,7 @@ paths:
         - Access Control
       parameters:
         - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/JWTHeaderToken'
       requestBody:
         required: false
       responses:
