@@ -65,7 +65,7 @@ paths:
         - Access Control
       parameters:
         - $ref: '#/components/parameters/UserId'
-        - $ref: '#/components/parameters/JWTHeaderToken'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       requestBody:
         required: false
       responses:
@@ -79,7 +79,7 @@ paths:
         - Customer Services
       parameters:
         - $ref: '#/components/parameters/UserId'  # Authorization required for a Customer Services
-        - $ref: '#/components/parameters/JWTHeaderToken'
+        - $ref: '#/components/parameters/AuthorizationHeader'
       security:
         - bearerAuth: []
       operationId: getCart
@@ -347,7 +347,7 @@ components:
       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
 
   parameters:
-    JWTHeaderToken: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
+    AuthorizationHeader: # Authorizattion HTTP request header field required for getting a Customer Services for a customer
       name: Authorize
       in: header
       schema:
