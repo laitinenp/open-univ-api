@@ -330,13 +330,13 @@ paths:
 
 tags:
   - name: Access Control
-    description: (v1.0) Represents an access control functions
+    description: (v1.0) Access control functions
   - name: Courses
-    description: (v1.0) Represents course descriptions
+    description: (v1.0) Course descriptions
   - name: Services
-    description: (v1.0) Represents service description objects
+    description: (v1.0) Service description objects
   - name: Customer Services
-    description: (v1.0) Represents a Customer Services objects and data
+    description: (v1.0) Represents Customer Services objects and data
 
 components:
 
