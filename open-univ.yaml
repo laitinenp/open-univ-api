@@ -4,8 +4,18 @@ info:
  title: (v1.0) open-univ project
  description: (v1.0) For educational purposes only. Petri Laitinen, Karelia UAS
 servers:
- - url: https://localhost:3000/
+ - url: http://localhost:3000/
    description: (v1.0) "Open University Sample API Application"
+
+tags:
+  - name: Access Control
+    description: (v1.0) Access control functions
+  - name: Courses
+    description: (v1.0) Course descriptions
+  - name: Services
+    description: (v1.0) Service description objects
+  - name: Customer Services
+    description: (v1.0) Represents Customer Services objects and data
 
 paths:
   /api/users:
@@ -129,7 +139,10 @@ paths:
       summary: Returns a list of available courses
       tags: 
         - Courses
-      operationId: listCourses
+      # operationId: listCourses
+      produces:
+        - application/json
+        - text/csv
       responses:
         '200':
           description: (v1.0) Succesfully returned a list of available courses
@@ -140,6 +153,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+            text/csv:
+              schema:
+                type: string
+              example: >-
+                id,name,description,learningObjectives
+                DD10004,API Design & Development,API Design & Development using REST, Student is able to comprehend the ...
         '415':
           description: Unsupported Media Type
     head:
@@ -150,7 +169,6 @@ paths:
       responses:
         '204':
           description: No content
-
     options:
       summary: Returns a list of applicable HTTP verbs in the Allow header field.
       tags:
@@ -326,17 +344,6 @@ paths:
             application/json:
               schema:
                 type: string
-
-
-tags:
-  - name: Access Control
-    description: (v1.0) Access control functions
-  - name: Courses
-    description: (v1.0) Course descriptions
-  - name: Services
-    description: (v1.0) Service description objects
-  - name: Customer Services
-    description: (v1.0) Represents Customer Services objects and data
 
 components:
 
@@ -571,7 +578,6 @@ components:
         username: brita
         password: sosecret
         email: brita@somemail.com
-
     Course:
       type: object
       properties:
