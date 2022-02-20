@@ -23,7 +23,6 @@ paths:
       summary: Creates an object of type User
       tags: 
         - Access Control
-      operationId: createUser
       requestBody:
         required: true
         content:
@@ -47,7 +46,6 @@ paths:
       summary: Login functionality. Creates JWT Token and passes it back for a caller.
       tags: 
         - Access Control
-      operationId: createSession
       requestBody:
         required: true
         content:
@@ -92,7 +90,6 @@ paths:
         - $ref: '#/components/parameters/AuthorizationHeader'
       security:
         - bearerAuth: []
-      operationId: getCart
       responses:
         '200':
           description: (v1.0) Succesfully returned a Customer Services
@@ -125,7 +122,6 @@ paths:
         - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
       security:
         - bearerAuth: []
-      operationId: postCart
       responses:
         '501':
           description: (v1.0) Not yet implemented
@@ -139,7 +135,6 @@ paths:
       summary: Returns a list of available courses
       tags: 
         - Courses
-      # operationId: listCourses
       produces:
         - application/json
         - text/csv
@@ -165,7 +160,6 @@ paths:
       summary: For testing if the resource URI is available
       tags:
         - Courses
-      operationId: listCourses
       responses:
         '204':
           description: No content
@@ -173,7 +167,6 @@ paths:
       summary: Returns a list of applicable HTTP verbs in the Allow header field.
       tags:
         - Courses
-      operationId: listCourses
       responses:
         204:
           description: No content. Response data in the Allow header field.
@@ -197,7 +190,6 @@ paths:
             example: DD10004
           required: true
           decription: numerical customer identifier
-      operationId: getCourse
       responses:
         '200':
           description: (v1.0) Succesfully returned a course object
@@ -215,7 +207,6 @@ paths:
       summary: Updates a Course object. If it does not exist before, then it is created.
       tags: 
         - Courses
-      operationId: putCourse
       parameters:
         - in: path
           name: course_id
@@ -257,7 +248,6 @@ paths:
         - $ref: '#/components/parameters/UserId'
       tags: 
         - Services
-      operationId: listServices
       
       responses:
         '200':
@@ -275,7 +265,6 @@ paths:
       summary: Creates an object of type Service
       tags: 
         - Services
-      operationId: createService
       requestBody:
         required: true
         content:
@@ -309,7 +298,6 @@ paths:
         schema:
           type: string
           format: uuid
-      operationId: findServiceById
       responses:
         200:
           description: (v1.0) Succesfully returned a service descriptor
@@ -334,7 +322,6 @@ paths:
           decription: numerical customer identifier
         - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
         - $ref: '#/components/requests/PostItemToCart'
-      operationId: postCart
       security:
         - bearerAuth: []
       responses:
