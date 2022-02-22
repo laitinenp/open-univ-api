@@ -46,6 +46,8 @@ paths:
       summary: Login functionality. Creates JWT Token and passes it back for a caller.
       tags: 
         - Access Control
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -71,9 +73,10 @@ paths:
       summary: Logout functionality.
       tags: 
         - Access Control
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/UserId'
-        - $ref: '#/components/parameters/AuthorizationHeader'
       requestBody:
         required: false
       responses:
@@ -87,7 +90,6 @@ paths:
         - Customer Services
       parameters:
         - $ref: '#/components/parameters/UserId'  # Authorization required for a Customer Services
-        - $ref: '#/components/parameters/AuthorizationHeader'
       security:
         - bearerAuth: []
       responses:
@@ -119,7 +121,6 @@ paths:
             example: 123
           required: true
           decription: numerical customer identifier
-        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
       security:
         - bearerAuth: []
       responses:
@@ -216,6 +217,8 @@ paths:
             example: DD10004
           required: true
           decription: numerical customer identifier
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -248,7 +251,8 @@ paths:
         - $ref: '#/components/parameters/UserId'
       tags: 
         - Services
-      
+      security:
+        - bearerAuth: []      
       responses:
         '200':
           description: (v1.0) Succesfully returned a list of available services
@@ -265,6 +269,8 @@ paths:
       summary: Creates an object of type Service
       tags: 
         - Services
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -290,6 +296,8 @@ paths:
       summary: Returns a service descriptor object
       tags: 
         - Services
+      security:
+        - bearerAuth: []
       parameters:
       - name: service_id
         in: path
@@ -311,6 +319,8 @@ paths:
       summary: Request a transcript of records
       tags:
         - Customer Services
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: userId
@@ -320,7 +330,6 @@ paths:
             example: '1234567890'
           required: true
           decription: numerical customer identifier
-        - $ref: '#/components/parameters/AuthorizationHeader'  # Authorization required for a Customer Services
         - $ref: '#/components/requests/PostItemToCart'
       security:
         - bearerAuth: []
